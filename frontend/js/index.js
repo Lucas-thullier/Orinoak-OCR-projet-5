@@ -1,14 +1,3 @@
-async function requestProducts()
-{
-   try {
-       let request = await fetch("http://localhost:3000/api/furniture")
-       
-       return await request.text();
-   } catch (error) {
-       console.log(error);
-   }
-}
-
 function generateList(response) 
 {
     let jsonApi = JSON.parse(response);
@@ -38,12 +27,14 @@ function generateList(response)
     return listBlock;
 }
 
-function displayList() 
-{
-    // obligés de s'imbriquer à chauqe fois qu'une requete est effectuée?
-    requestProducts().then((response) => {
-        let productsList = generateList(response);
-        let section = document.getElementsByTagName('section')[0];
-        return section.append(productsList);
-    });
-}
+// function displayList() 
+// {
+//     // obligés de s'imbriquer à chauqe fois qu'une requete est effectuée?
+//     let request = fetch("http://localhost:3000/api/furniture");
+//     request.then(response => {
+//         let productsList = generateList(response);
+//         let section = document.getElementsByTagName('section')[0];
+//         return section.append(productsList);
+//     })
+//     .catch(error => { console.log(error) });
+// }
