@@ -52,55 +52,81 @@ function sendCommand()
         }
     });
 }
+const form = document.querySelector('form[id="buyingForm"]');
 
-function isValidName(firstOrLastName)
+function isValidField(fieldId, stringRegex)
 {
-    let name  = document.getElementById(firstOrLastName);
-    let nameValue = name.value.trim();
-
-    if (nameValue.match(/^[éèùêçàa-zA-Z-]{2,40}$/)) {
-        return true;
-    } else {
-        name.classList.add('bg-danger');
-        return false;
-    }
-}
-
-function isValidAdress()
-{
-    let adress  = document.getElementById('adresse');
-    let adressValue = adress.value.trim();
+    const inputField = document.querySelector('input[id='+ fieldId +']');
+    inputField.setAttribute('pattern', stringRegex);
+    inputField.addEventListener('input', () => {
+        inputField.setCustomValidity('');
+        inputField.checkValidity();
+    });
     
-    if (adressValue.match(/^[\séèùêçàa-zA-Z\d'-]{1,70}$/)) {
-        return true;
-    } else {
-        adress.classList.add('bg-danger');
-        return false;
-    }
+    inputField.addEventListener('invalid', () => {
+        if(inputField.value === '') {
+            inputField.setCustomValidity('Enter your username!');
+        } else {
+            inputField.setCustomValidity('Un prénom ne peut contenir que des lettres minuscules ou majuscules. Essayez encore !');
+        }
+    });
+
 }
+isValidField(fieldId, stringRegex);
+isValidField(fieldId, stringRegex);
+isValidField(fieldId, stringRegex);
+isValidField(fieldId, stringRegex);
+// function checkAllFieldValidity
 
-function isValidCity()
-{
-    let city  = document.getElementById('ville');
-    let cityValue = city.value.trim();
 
-    if (cityValue.match(/^[éèùêçàa-zA-Z-]{2,40}$/)) {
-        return true;
-    } else {
-        city.classList.add('bg-danger');
-        return false;
-    }
-}
+// function isValidName(firstOrLastName)
+// {
+//     let name  = document.getElementById(firstOrLastName);
+//     let nameValue = name.value.trim();
 
-function isValidEmail()
-{
-    let email  = document.getElementById('email');
-    let emailValue = email.value.trim();
+//     if (nameValue.match(/^[éèùêçàa-zA-Z-]{2,40}$/)) {
+//         return true;
+//     } else {
+//         name.classList.add('bg-danger');
+//         return false;
+//     }
+// }
 
-    if (emailValue.match(/^(?:[\w-]{1,20}@[\w-]{1,20}.[\w-]{1,5})$/)) {
-        return true;
-    } else {
-        email.classList.add('bg-danger');
-        return false;
-    }
-}
+// function isValidAdress()
+// {
+//     let adress  = document.getElementById('adresse');
+//     let adressValue = adress.value.trim();
+    
+//     if (adressValue.match(/^[\séèùêçàa-zA-Z\d'-]{1,70}$/)) {
+//         return true;
+//     } else {
+//         adress.classList.add('bg-danger');
+//         return false;
+//     }
+// }
+
+// function isValidCity()
+// {
+//     let city  = document.getElementById('ville');
+//     let cityValue = city.value.trim();
+
+//     if (cityValue.match(/^[éèùêçàa-zA-Z-]{2,40}$/)) {
+//         return true;
+//     } else {
+//         city.classList.add('bg-danger');
+//         return false;
+//     }
+// }
+
+// function isValidEmail()
+// {
+//     let email  = document.getElementById('email');
+//     let emailValue = email.value.trim();
+
+//     if (emailValue.match(/^(?:[\w-]{1,20}@[\w-]{1,20}.[\w-]{1,5})$/)) {
+//         return true;
+//     } else {
+//         email.classList.add('bg-danger');
+//         return false;
+//     }
+// }

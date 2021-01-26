@@ -1,3 +1,5 @@
+/* Déclaration des fonctions de la page */
+
 function generateList(response) 
 {
     let jsonApi = JSON.parse(response);
@@ -27,14 +29,20 @@ function generateList(response)
     return listBlock;
 }
 
-// function displayList() 
-// {
-//     // obligés de s'imbriquer à chauqe fois qu'une requete est effectuée?
-//     let request = fetch("http://localhost:3000/api/furniture");
-//     request.then(response => {
-//         let productsList = generateList(response);
-//         let section = document.getElementsByTagName('section')[0];
-//         return section.append(productsList);
-//     })
-//     .catch(error => { console.log(error) });
-// }
+function displayList() 
+{
+    let request = fetch("http://localhost:3000/api/furniture");
+    request.then(response => {
+        response.text().then(productsFromResponse => {
+            let productsList = generateList(productsFromResponse);
+            let section = document.getElementsByTagName('section')[0];
+
+            return section.append(productsList);
+        })
+        .catch(error => console.log(error));
+    })
+    .catch(error => console.log(error));
+}
+
+/* Appel des fonctions de la page */
+displayList();
