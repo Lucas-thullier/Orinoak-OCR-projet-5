@@ -1,48 +1,30 @@
 displayDetails();
 
-function displayDetails()
-{
-    requestOneProduct()
+function displayDetails() {
+    const productId = getOneUrlParameter('id');
+    requestApi(`http://localhost:3000/api/furniture/${productId}`)
     .then((oneProductString) => {
-        const detailsSection = document.getElementById('detailsSection');
-        console.log();
-
-        /* Génération des différentes parties */
         const oneProductParsed = JSON.parse(oneProductString);
         const product = new Product(oneProductParsed);    
+        const detailsSection = document.getElementById('detailsSection');
 
-        const productDetailsBlock = product.detailDisplay();
-        const varnishBlock = product.varnishSelectorDisplay();
+        const productDetailsBlock = product.generateDetailBlock();
+        const varnishBlock = product.generateVarnishBlock();
         const button = generateButton();
         
-        /* On ajoute les différentes parties au bloc de détail */
         detailsSection.append(productDetailsBlock);
         detailsSection.append(varnishBlock);
         detailsSection.append(button);
         
-        addToPanier(button, product);
+        addedProductFeedback();
+        setToCartListener(button, product);
     })
     .catch((error) => {
         console.log(error);
     });
 }
 
-function requestOneProduct() 
-{
-    const productId = getProductIdByUrl(window.location.href);
-    const urlToRequestOneProduct = `http://localhost:3000/api/furniture/${productId}`
-    return requestApi(urlToRequestOneProduct)
-}
-
-function getProductIdByUrl(locationHref) 
-{
-    const parsedUrl = new URL(locationHref);
-    const productId = parsedUrl.searchParams.get('id');
-    return productId;
-}
-
-function generateButton()
-{
+function generateButton() {
     const button = document.createElement('button');
 
     button.id = 'addToPanier';
@@ -53,12 +35,29 @@ function generateButton()
     return button;
 }
 
-function addToPanier(button, product) // button = élément sur lequel fixer l'eventListener
-{
+function setToCartListener(button, product) {
     button.addEventListener('click', () => {
         const cart = new Cart();
         product.varnish = document.getElementById('select-varnish').value;
+        product.setCartId();
+
+        cart.fillCartWithStorage();
         cart.addProduct(product);
         cart.goToLocalStorage();
+    });
+}
+
+function addedProductFeedback() {
+    const buttonBlock = document.getElementById('addToPanier');
+
+    buttonBlock.addEventListener('click', () => {
+        buttonBlock.classList.remove('btn-primary');
+        buttonBlock.classList.add('btn-success');
+        buttonBlock.innerHTML = 'Produit ajouté au panier';
+        setTimeout(() => {
+            buttonBlock.classList.remove('btn-success');
+            buttonBlock.classList.add('btn-primary');
+            buttonBlock.innerHTML = 'Ajouter au panier';
+        }, 1000)
     });
 }
