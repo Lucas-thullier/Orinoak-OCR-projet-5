@@ -1,106 +1,74 @@
-function sendCommand()
-{
-    addToPanierButton = document.getElementById('addToPanier');
+sendCommand();
+setInputsValidityListener();
+
+function sendCommand() {
+    const addToPanierButton = document.getElementById('sendCommand');
     addToPanierButton.addEventListener('click', (e) => {
         e.preventDefault();
-
-        /* construction de l'array products à partir du panier */
-        if (localStorage.getItem('panier') !== null) {
-            let panier = localStorage.getItem('panier');
-            panier = JSON.parse(panier);
+        if (cart.isEmpty()) {
+            window.alert('Votre panier est vide !');
+        } else if (!checkInputsValidity()) {
+            window.alert('Un des champs du formulaire de commande est mal renseigné !');
             
-            let products = [];
-            let contact = {};
-            let request = {};
-    
-            for (const i in panier) {
-                products.push(panier[i]._id);
-            }
-            /* FIN construction de l'array products à partir du panier */
-    
-            /* Vérification des champs du formulaire */
-            if (isValidName('prenom') && isValidName('nom') && isValidAdress() && isValidCity() && isValidEmail()) {
-                contact.firstName = document.getElementById('prenom').value;
-                contact.lastName = document.getElementById('nom').value;
-                contact.address = document.getElementById('adresse').value;
-                contact.city = document.getElementById('ville').value;
-                contact.email = document.getElementById('email').value;
-    
-                request.products = products;
-                request.contact = contact;
-                request = JSON.stringify(request);
-    
-                var requestOptions = {
-                    method: 'POST',
-                    body: request,
-                    headers : {
-                        'Content-Type': 'application/json'
-                    }
-                };
-                  
-                /* TODO check le statut avecresponse.ok et ouvrir la page via localstorage et non window.open */
-                fetch("http://localhost:3000/api/furniture/order", requestOptions)
-                .then(response => response.text())
-                .then(result => window.open('../html/confirmBuy.html?request='+result))
-                .catch(error => console.log('error', error));
-    
-            } else {
-                alert('Un des champs est mal renseigné');
-            }
         } else {
-            alert('Votre panier est vide');
+            const requestBody = prepareRequestBody();
+            const urlToRequest = "http://localhost:3000/api/furniture/order";
+
+            requestApi(urlToRequest, 'POST', requestBody)
+            .then((result) => {
+                window.open('../html/confirmBuy.html?request='+result)
+            })
+            .catch((error) => {
+                console.log(error);
+            })            
         }
     });
 }
 
-function isValidName(firstOrLastName)
-{
-    let name  = document.getElementById(firstOrLastName);
-    let nameValue = name.value.trim();
-
-    if (nameValue.match(/^[éèùêçàa-zA-Z-]{2,40}$/)) {
-        return true;
-    } else {
-        name.classList.add('bg-danger');
-        return false;
-    }
+function setInputsValidityListener() {
+    const allInputs = document.querySelectorAll('input');
+    allInputs.forEach(singleInput => {
+        singleInput.addEventListener('input', () => {
+            singleInput.setCustomValidity('');
+            singleInput.checkValidity();
+        });
+        
+        singleInput.addEventListener('invalid', () => {
+            singleInput.setCustomValidity(`Le champ est mal renseigné !`);
+        });
+    });
 }
 
-function isValidAdress()
-{
-    let adress  = document.getElementById('adresse');
-    let adressValue = adress.value.trim();
-    
-    if (adressValue.match(/^[\séèùêçàa-zA-Z\d'-]{1,70}$/)) {
-        return true;
-    } else {
-        adress.classList.add('bg-danger');
-        return false;
+function checkInputsValidity() {
+    const allInputs = document.querySelectorAll('input');
+    for (const singleInput of allInputs) {
+        if (!singleInput.validity.valid || singleInput.value === "") {
+            return false;
+        }
     }
+    return true;
 }
 
-function isValidCity()
-{
-    let city  = document.getElementById('ville');
-    let cityValue = city.value.trim();
+function prepareContact() {
+    const allInputs = document.querySelectorAll('input');
+    let contact = {};
 
-    if (cityValue.match(/^[éèùêçàa-zA-Z-]{2,40}$/)) {
-        return true;
-    } else {
-        city.classList.add('bg-danger');
-        return false;
-    }
+    allInputs.forEach(singleInput => {
+        const fieldId = singleInput.id;
+        contact[fieldId] = singleInput.value;
+    });
+
+    return contact;
 }
 
-function isValidEmail()
-{
-    let email  = document.getElementById('email');
-    let emailValue = email.value.trim();
+function prepareRequestBody() {
+    const products = cart.getAllProductsToCommand();
+    const contact = prepareContact();
+    let requestBody = {};
 
-    if (emailValue.match(/^(?:[\w-]{1,20}@[\w-]{1,20}.[\w-]{1,5})$/)) {
-        return true;
-    } else {
-        email.classList.add('bg-danger');
-        return false;
-    }
+    requestBody.products = products;
+    requestBody.contact = contact;
+    requestBody = JSON.stringify(requestBody);
+
+    return requestBody;
 }
